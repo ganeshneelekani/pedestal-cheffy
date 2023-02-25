@@ -1,0 +1,13 @@
+drop table message;
+--;;
+drop table conversation;
+--;;
+drop table recipe_favorite;
+--;;
+drop table ingredient;
+--;;
+drop table step;
+--;;
+drop table recipe;
+--;;
+drop table account;

@@ -1,6 +1,7 @@
 (ns cheffy.routes
   (:require [io.pedestal.http :as http]
-            [io.pedestal.http.route :as route]))
+            [io.pedestal.http.route :as route]
+            [cheffy.recipes :as recipes]))
 
 (defn list-recipes
   [request]
@@ -14,7 +15,6 @@
 
 (def routes
   (route/expand-routes
-   #{{:app-name :cheffy :schema :http :host "localhost.com"}
-     ["/recipes" :get list-recipes :route-name :list-recipes]
-     ["/recipes" :post upsert-recipe :route-name :create-recipe]
-     ["/recipes/:recipe-id" :put upsert-recipe :route-name :update-recipe]}))
+   #{["/recipes" :get recipes/list-recipes :route-name :list-recipes]
+     ["/recipes" :post recipes/create-recipe :route-name :create-recipe]
+     ["/recipes/:recipe-id" :put recipes/create-recipe :route-name :update-recipe]}))

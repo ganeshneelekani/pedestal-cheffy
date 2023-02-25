@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    image: postgis/postgis:11-2.5
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: dockerdb
+    volumes:
+    - ./test_data/pg_create_db.sql:/docker-entrypoint-initdb.d/01-pg_create_db.sql
+    - ./test_data/user_data_schema.sql.gz:/home/user_data_schema.sql.gz
+    - ./test_data/user_data.sql.gz:/home/user_data.sql.gz
+    - ./test_data/sample_data:/home/sample_data  
+    - ./test_data/pg_setup.sh:/docker-entrypoint-initdb.d/02-pg_setup.sh
+    ports:
+      - "5432:5432"

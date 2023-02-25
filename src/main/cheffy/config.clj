@@ -1,21 +1,24 @@
 (ns cheffy.config)
 
-(def server-config
-  {:service-map {:io.pedestal.http/type :jetty
-                 :io.pedestal.http/join? false
-                 :io.pedestal.http/port (or (System/getenv "PORT") 3100)}})
+(def database {:dbname   (or (System/getenv "DB_DBNAME") "it_data")
+               :user     (or (System/getenv "DB_USER") "myuser")
+               :password (or (System/getenv "DB_PASSWORD") "mypassword")
+               :host     (or (System/getenv "DB_HOST") "localhost")
+               :port     (or (System/getenv "DB_PORT") 5432)
+               :dbtype   "postgresql"})
 
-(def db {:dbname   (or (System/getenv "DB_DBNAME") "it_data")
-         :user     (or (System/getenv "DB_USER") "myuser")
-         :password (or (System/getenv "DB_PASSWORD") "mypassword")
-         :host     (or (System/getenv "DB_HOST") "localhost")
-         :port     (or (System/getenv "DB_PORT") 5432)
-         :dbtype   "postgresql"})
+(def server-config
+  {:service-map {:env :dev
+                 :io.pedestal.http/type :jetty
+                 :io.pedestal.http/join? false
+                 :io.pedestal.http/port (or (System/getenv "PORT") 3100)}
+
+   :database database})
 
 (def migratus-config
   {:store         :database
    :migration-dir "migrations1"
-   :db            db})
+   :db            database})
 
 ;; (def config
 ;;   {:server/jetty {:handler (ig/ref :cheffy/app)
