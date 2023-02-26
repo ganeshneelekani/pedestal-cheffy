@@ -19,3 +19,14 @@
                (assoc recipe :public false
                       :favorite-count 0)
                jdbc/snake-kebab-opts))
+
+(defn find-recipe-by-id
+  [db recipe-id]
+  (with-open [conn (jdbc/get-connection db)]
+    (let [[recipe] (sql/find-by-keys conn :recipe {:recipe_id recipe-id})
+          steps (sql/find-by-keys conn :step {:recipe_id recipe-id})
+          ingredeints (sql/find-by-keys conn :ingredient {:recipe_id recipe-id})]
+      (when (seq recipe)
+        (assoc recipe
+               :recipe/steps steps
+               :recipe/ingredients ingredeints)))))

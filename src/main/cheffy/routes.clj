@@ -15,6 +15,7 @@
 
 (def routes
   (route/expand-routes
-   #{["/recipes" :get recipes/list-recipes :route-name :list-recipes]
-     ["/recipes" :post recipes/create-recipe :route-name :create-recipe]
-     ["/recipes/:recipe-id" :put recipes/create-recipe :route-name :update-recipe]}))
+   #{;;  ["/recipes" :get recipes/list-recipes :route-name :list-recipes]
+    ;;  ["/recipes" :post recipes/create-recipe :route-name :create-recipe]
+     ["/recipes/:recipe-id" :get recipes/retrieve-recipe :route-name :retrieve-recipe]
+     #_["/recipes/:recipe-id" :put recipes/create-recipe :route-name :update-recipe]}))

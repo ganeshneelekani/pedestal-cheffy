@@ -127,6 +127,24 @@
                          :prep-time 30
                          :img "https://github.com/clojure.png"}))
 
+  (pt/response-for
+   (-> cr/system :api-server :service ::http/service-fn)
+   :post "/recipes"
+   :headers {"Authorization" "auth0|63f3527a09b12c77b8d383b6"
+             "Content-Type" "application/transit+json"}
+   :body (transit-write {:name "name"
+                         :public true
+                         :prep-time 30
+                         :img "https://github.com/clojure.png"}))
+
+  (pt/response-for
+   (-> cr/system :api-server :service ::http/service-fn)
+   :get "/recipes/a1995316-80ea-4a98-939d-7c6295e4bb46"
+   :headers {"Authorization" "auth0|63f3527a09b12c77b8d383b6"
+             "Content-Type" "application/transit+json"}
+    ;; a1995316-80ea-4a98-939d-7c6295e4bb46)
+   )
+
   (sql/insert! (-> cr/system :database :database) :recipe {:recipe_id "asa"
                                                            :uid "auth0|63f3527a09b12c77b8d383b6"
                                                            :name "name"
