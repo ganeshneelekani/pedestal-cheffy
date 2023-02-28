@@ -30,3 +30,9 @@
         (assoc recipe
                :recipe/steps steps
                :recipe/ingredients ingredeints)))))
+
+(defn delete-recipe!
+  [conn recipe]
+  (-> (sql/delete! conn :recipe recipe)
+      :next.jdbc/update-count
+      (pos?)))

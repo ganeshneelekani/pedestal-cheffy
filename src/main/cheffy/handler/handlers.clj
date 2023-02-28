@@ -5,6 +5,9 @@
 
 (def base-url "https://api.recipe.com")
 
+
+
+
 (defn list-recipes-response
   [request]
   (let [db (get-in request [:system/database :database])
@@ -20,6 +23,7 @@
     (db/insert-recipe! conn (assoc recipe :recipe-id recipe-id :uid uid))
     (rr/created (str base-url "/recipes/" recipe-id) {:recipe-id recipe-id})))
 
+
 (defn retrieve-recipe-response
   [request]
   (let [db (get-in request [:system/database :database])
@@ -27,6 +31,17 @@
         recipe (db/find-recipe-by-id db recipe-id)]
     (if recipe
       (rr/response recipe)
+      (rr/not-found {:type    "recipe-not-found"
+                     :message "Recipe not found"
+                     :data    (str "recipe-id " recipe-id)}))))
+
+(defn delete-recipe-response
+  [request]
+  (let [recipe-id (get-in request [:path-params :recipe-id])
+        conn (get-in request [:system/database :conn])
+        deleted? (db/delete-recipe! conn {:recipe-id recipe-id})]
+    (if deleted?
+      (rr/status 204)
       (rr/not-found {:type    "recipe-not-found"
                      :message "Recipe not found"
                      :data    (str "recipe-id " recipe-id)}))))

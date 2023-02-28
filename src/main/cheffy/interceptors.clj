@@ -14,3 +14,9 @@
              (let [conn (get-in ctx [:request :system/database :conn])
                    db (get-in ctx [:request :system/database :database])]
                (update-in ctx [:request :system/database] assoc :db db)))}))
+
+(def recipe-interceptor
+  (interceptor/interceptor
+   {:name ::recipe-interceptor
+    :enter (fn [ctx])}))
+
