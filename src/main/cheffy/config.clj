@@ -7,13 +7,19 @@
                :port     (or (System/getenv "DB_PORT") 5432)
                :dbtype   "postgresql"})
 
-(def server-config
-  {:service-map {:env :dev
-                 :io.pedestal.http/type :jetty
-                 :io.pedestal.http/join? false
-                 :io.pedestal.http/port (or (System/getenv "PORT") 3100)}
+(def auth-config {:client-id (or (System/getenv "AUTH_CLIENT_ID") "6b7o54l015fc7f2brn0uh6ibr")
+                  :client-secret (or (System/getenv "AUTH_CLIENT_SECREAT") "1s6cp8oiujjnfso0d1bllbdbe5tfnlage40ce3v2b29fhjs9is0k")
+                  :user-pool-id (or (System/getenv "AUTH_POOL_ID") "us-east-1_vhfZ33jne")})
 
-   :database database})
+(def service-map {:env :dev
+                  :io.pedestal.http/type :jetty
+                  :io.pedestal.http/join? false
+                  :io.pedestal.http/port (or (System/getenv "PORT") 3100)})
+
+(def server-config
+  {:service-map service-map
+   :database database
+   :auth auth-config})
 
 (def migratus-config
   {:store         :database

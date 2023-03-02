@@ -8,8 +8,12 @@
             [next.jdbc :as jdbc]
             [next.jdbc.sql :as sql]
             [io.pedestal.test :as pt]
-            [cognitect.transit :as transit])
-  (:import (java.io ByteArrayOutputStream ByteArrayInputStream)))
+            [cognitect.transit :as transit]
+            [cognitect.aws.client.api :as aws])
+  (:import (java.io ByteArrayOutputStream ByteArrayInputStream)
+           (java.util Date Base64)
+           (javax.crypto Mac)
+           (javax.crypto.spec SecretKeySpec)))
 
 
 (defonce system-ref (atom nil))
@@ -72,6 +76,16 @@
   (let [in (ByteArrayInputStream. (.getBytes txt))
         reader (transit/reader in :json)]
     (transit/read reader)))
+
+(defn calculate-secret-hash
+  [{:keys [client-id client-secret username]}]
+  (let [hmac-sha256-algorithm "HmacSHA256"
+        signing-key (SecretKeySpec. (.getBytes client-secret) hmac-sha256-algorithm)
+        mac (doto (Mac/getInstance hmac-sha256-algorithm)
+              (.init signing-key)
+              (.update (.getBytes username)))
+        raw-hmac (.doFinal mac (.getBytes client-id))]
+    (.encodeToString (Base64/getEncoder) raw-hmac)))
 
 
 (comment
@@ -163,6 +177,32 @@
     ;; a3dde84c-4a33-45aa-b0f3-4bf9ac997680
    )
 
+
+  (def cognito-idp (aws/client {:api :cognito-idp}))
+
+  (aws/ops cognito-idp)
+
+  (aws/doc cognito-idp :SignUp)
+
+  (aws/validate-requests cognito-idp true)
+
+  (let [client-id (-> cr/system :auth :config :client-id)
+        client-secret (-> cr/system :auth :config :client-secret)
+        cognito-idp (-> cr/system :auth :cognito-idp)
+        email "ganeshneelekani07@gmail.com"]
+    (aws/invoke cognito-idp
+                {:op :SignUp
+                 :request
+                 {:ClientId client-id
+                  :Username "ganeshneelekani07@gmail.com"
+                  :Password "MyPassword1@"
+                  :SecretHash (calculate-secret-hash
+                               {:client-id client-id
+                                :client-secret client-secret
+                                :username email})}}))
+
+
+  (-> cr/system :auth)
   (start-dev)
 
   (restart-dev)

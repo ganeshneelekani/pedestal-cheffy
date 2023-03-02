@@ -13,9 +13,12 @@
   {:status 200
    :body "upsert recipes"})
 
-(def routes
+(defn routes
+  []
   (route/expand-routes
-   #{["/recipes" :get recipes/list-recipes :route-name :list-recipes]
+   #{["/account/sign-up" :post account/sign-up :route-name :sign-up]
+     ["/account/confirm" :post account/confirm :route-name :confirm]
+     ["/recipes" :get recipes/list-recipes :route-name :list-recipes]
      ["/recipes" :post recipes/create-recipe :route-name :create-recipe]
      ["/recipes/:recipe-id" :get recipes/retrieve-recipe :route-name :retrieve-recipe]
      ["/recipes/:recipe-id" :put recipes/create-recipe :route-name :update-recipe]

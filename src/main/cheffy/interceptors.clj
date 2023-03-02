@@ -1,7 +1,8 @@
 (ns cheffy.interceptors
   (:require [io.pedestal.interceptor :as interceptor]
             [cheffy.db.recipe :as db]
-            [ring.util.response :as rr]))
+            [ring.util.response :as rr]
+            [cheffy.components.auth :as auth]))
 
 (def base-url "https://api.recipe.com")
 
@@ -35,3 +36,32 @@
                    conn (get-in ctx [:request :system/database :conn])]
                (db/insert-recipe! conn (assoc recipe :recipe-id recipe-id :uid uid))
                (rr/created (str base-url "/recipes/" recipe-id) {:recipe-id recipe-id})))}))
+
+(def sign-up-interceptor
+  {:name ::sign-up-interceptor
+   :enter (fn [{:keys [request] :as ctx}]
+            (let [create-cognito-account (auth/create-cognito-account
+                                          (:system/auth request)
+                                          (:transit-params request))]
+              (assoc ctx :tx-data create-cognito-account)))
+   :leave (fn [ctx]
+            (let [account-id (-> ctx :tx-data (first) :account/account-id)]
+              (assoc ctx :response (rr/response {:account-id account-id}))))})
+
+(def confirm-account-interceptor
+  {:name ::confirm-account-interceptor
+   :enter (fn [{:keys [request] :as ctx}]
+            (auth/confirm-cognito-account
+             (:system/auth request)
+             (:transit-params request))
+            ctx)
+   :leave (fn [ctx]
+            (assoc ctx :response (rr/status 204)))})
+
+(def transact-interceptor
+  (interceptor/interceptor
+   {:name ::transact-interceptor
+    :enter (fn [ctx]
+             (let [conn (get-in ctx [:request :system/database :conn])
+                   tx-data (get ctx :tx-data)]
+               (assoc ctx :tx-result (d/transact conn {:tx-data tx-data}))))}))
