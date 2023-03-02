@@ -182,7 +182,11 @@
 
   (aws/ops cognito-idp)
 
+  (print (keys (aws/ops cognito-idp)))
+
   (aws/doc cognito-idp :SignUp)
+
+  (aws/doc cognito-idp :ConfirmSignUp)
 
   (aws/validate-requests cognito-idp true)
 
@@ -196,6 +200,22 @@
                  {:ClientId client-id
                   :Username "ganeshneelekani07@gmail.com"
                   :Password "MyPassword1@"
+                  :SecretHash (calculate-secret-hash
+                               {:client-id client-id
+                                :client-secret client-secret
+                                :username email})}}))
+
+
+  (let [client-id (-> cr/system :auth :config :client-id)
+        client-secret (-> cr/system :auth :config :client-secret)
+        cognito-idp (-> cr/system :auth :cognito-idp)
+        email "ganeshneelekani07@gmail.com"]
+    (aws/invoke cognito-idp
+                {:op :ConfirmSignUp
+                 :request
+                 {:ClientId client-id
+                  :Username email
+                  :ConfirmationCode "359132"
                   :SecretHash (calculate-secret-hash
                                {:client-id client-id
                                 :client-secret client-secret

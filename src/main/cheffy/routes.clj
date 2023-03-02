@@ -1,7 +1,8 @@
 (ns cheffy.routes
   (:require [io.pedestal.http :as http]
             [io.pedestal.http.route :as route]
-            [cheffy.recipes :as recipes]))
+            [cheffy.recipes :as recipes]
+            [cheffy.account :as account]))
 
 (defn list-recipes
   [request]

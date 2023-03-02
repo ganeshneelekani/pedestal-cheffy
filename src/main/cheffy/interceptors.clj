@@ -2,7 +2,8 @@
   (:require [io.pedestal.interceptor :as interceptor]
             [cheffy.db.recipe :as db]
             [ring.util.response :as rr]
-            [cheffy.components.auth :as auth]))
+            [cheffy.components.auth :as auth]
+            [next.jdbc.sql :as sql]))
 
 (def base-url "https://api.recipe.com")
 
@@ -48,6 +49,15 @@
             (let [account-id (-> ctx :tx-data (first) :account/account-id)]
               (assoc ctx :response (rr/response {:account-id account-id}))))})
 
+
+(def transact-interceptor
+  (interceptor/interceptor
+   {:name ::transact-interceptor
+    :enter (fn [ctx]
+             (let [conn (get-in ctx [:request :system/database :conn])
+                   tx-data (get ctx :tx-data)]
+               (assoc ctx :tx-result (sql/insert! conn :account tx-data))))}))
+
 (def confirm-account-interceptor
   {:name ::confirm-account-interceptor
    :enter (fn [{:keys [request] :as ctx}]
@@ -58,10 +68,10 @@
    :leave (fn [ctx]
             (assoc ctx :response (rr/status 204)))})
 
-(def transact-interceptor
+(def query-interceptor
   (interceptor/interceptor
-   {:name ::transact-interceptor
+   {:name ::query-interceptor
     :enter (fn [ctx]
-             (let [conn (get-in ctx [:request :system/database :conn])
-                   tx-data (get ctx :tx-data)]
-               (assoc ctx :tx-result (d/transact conn {:tx-data tx-data}))))}))
+             (let [q-data (get ctx :q-data)]
+               (assoc ctx :q-result (d/q q-data))))}))
+

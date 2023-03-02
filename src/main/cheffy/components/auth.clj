@@ -26,14 +26,13 @@
         client-secret (:client-secret config)
         result (aws/invoke cognito-idp
                            {:op :SignUp
-                            :request
-                            {:ClientId client-id
-                             :Username email
-                             :Password password
-                             :SecretHash (calculate-secret-hash
-                                          {:client-id client-id
-                                           :client-secret client-secret
-                                           :username email})}})]
+                            :request {:ClientId client-id
+                                      :Username email
+                                      :Password password
+                                      :SecretHash (calculate-secret-hash
+                                                   {:client-id client-id
+                                                    :client-secret client-secret
+                                                    :username email})}})]
     (when-anomaly-throw result)
     [{:account/account-id (:UserSub result)
       :account/display-name email}]))
@@ -53,8 +52,6 @@
                                            :client-secret client-secret
                                            :username email})}})]
     (when-anomaly-throw result)))
-
-
 
 (defrecord Auth [config cognito-idp]
 
