@@ -3,7 +3,8 @@
             [cheffy.db.recipe :as db]
             [ring.util.response :as rr]
             [cheffy.components.auth :as auth]
-            [next.jdbc.sql :as sql]))
+            [next.jdbc.sql :as sql]
+            [clojure.string :as string]))
 
 (def base-url "https://api.recipe.com")
 
@@ -41,6 +42,7 @@
 (def sign-up-interceptor
   {:name ::sign-up-interceptor
    :enter (fn [{:keys [request] :as ctx}]
+            (println "---------1---------")
             (let [create-cognito-account (auth/create-cognito-account
                                           (:system/auth request)
                                           (:transit-params request))]
@@ -68,10 +70,24 @@
    :leave (fn [ctx]
             (assoc ctx :response (rr/status 204)))})
 
-(def query-interceptor
+(defn get-token
+  [ctx]
+  (-> ctx
+      (get-in [:request :headers "authorization"])
+      (string/split #" ")
+      (second)))
+
+(def verify-json-web-token
   (interceptor/interceptor
-   {:name ::query-interceptor
-    :enter (fn [ctx]
-             (let [q-data (get ctx :q-data)]
-               (assoc ctx :q-result (d/q q-data))))}))
+   {:name ::verify-json-web-token
+    :enter (fn [{:keys [request] :as ctx}]
+             (let [claims (auth/verify-and-get-payload (:system/auth request) (get-token ctx))]
+               (assoc-in ctx [:request :claims] claims)))}))
+
+#_(def query-interceptor
+    (interceptor/interceptor
+     {:name ::query-interceptor
+      :enter (fn [ctx]
+               (let [q-data (get ctx :q-data)]
+                 (assoc ctx :q-result (d/q q-data))))}))
 

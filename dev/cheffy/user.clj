@@ -193,12 +193,12 @@
   (let [client-id (-> cr/system :auth :config :client-id)
         client-secret (-> cr/system :auth :config :client-secret)
         cognito-idp (-> cr/system :auth :cognito-idp)
-        email "ganeshneelekani07@gmail.com"]
+        email "ganeshneelekani08@gmail.com"]
     (aws/invoke cognito-idp
                 {:op :SignUp
                  :request
                  {:ClientId client-id
-                  :Username "ganeshneelekani07@gmail.com"
+                  :Username email
                   :Password "MyPassword1@"
                   :SecretHash (calculate-secret-hash
                                {:client-id client-id
@@ -220,6 +220,27 @@
                                {:client-id client-id
                                 :client-secret client-secret
                                 :username email})}}))
+
+
+  (aws/doc cognito-idp :AdminInitiateAuth)
+
+  (let [client-id (-> cr/system :auth :config :client-id)
+        client-secret (-> cr/system :auth :config :client-secret)
+        cognito-idp (-> cr/system :auth :cognito-idp)
+        user-pool-id (-> cr/system :auth :config :user-pool-id)
+        email "ganeshneelekani07@gmail.com"]
+    (aws/invoke cognito-idp
+                {:op :AdminInitiateAuth
+                 :request
+                 {:ClientId client-id
+                  :UserPoolId user-pool-id
+                  :AuthFlow "ADMIN_USER_PASSWORD_AUTH"
+                  :AuthParameters {"USERNAME" email
+                                   "PASSWORD" "MyPassword1@"
+                                   "SECRET_HASH" (calculate-secret-hash
+                                                  {:client-id client-id
+                                                   :client-secret client-secret
+                                                   :username email})}}}))
 
 
   (-> cr/system :auth)
