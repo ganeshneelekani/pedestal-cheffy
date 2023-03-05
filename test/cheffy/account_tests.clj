@@ -7,12 +7,12 @@
 
 (def service-fn (-> cr/system :api-server :service ::http/service-fn))
 
-(def random-email (atom (str "ganeshneeelekani+" (random-uuid) "@gmail.com")))
+(def random-email (atom (str "ganeshneelekani+" (random-uuid) "@gmail.com")))
 
 (def tokens (atom nil))
 
 (deftest account-tests
-  (testing "sing-up"
+  (testing "sign-up"
     (let [{:keys [status body]} (-> (pt/response-for
                                      service-fn
                                      :post "/account/sign-up"
@@ -22,6 +22,7 @@
                                     (update :body ts/transit-read))]
       (is (= 200 status))
       (is (contains? body :account-id))))
+
 
   (testing "confirm"
     (let [{:keys [status]} (pt/response-for

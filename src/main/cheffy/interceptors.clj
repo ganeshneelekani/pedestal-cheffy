@@ -4,7 +4,8 @@
             [ring.util.response :as rr]
             [cheffy.components.auth :as auth]
             [next.jdbc.sql :as sql]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clojure.pprint :as pprint]))
 
 (def base-url "https://api.recipe.com")
 
@@ -42,12 +43,15 @@
 (def sign-up-interceptor
   {:name ::sign-up-interceptor
    :enter (fn [{:keys [request] :as ctx}]
-            (println "---------1---------")
+            (println "---------1111---------" (keys request))
+            (println "----1@---------" (:system/auth request))
             (let [create-cognito-account (auth/create-cognito-account
                                           (:system/auth request)
-                                          (:transit-params request))]
+                                          (:transit-params request))
+                  _ (println "---2.1-----" create-cognito-account)]
               (assoc ctx :tx-data create-cognito-account)))
    :leave (fn [ctx]
+            (println "---K----")
             (let [account-id (-> ctx :tx-data (first) :account/account-id)]
               (assoc ctx :response (rr/response {:account-id account-id}))))})
 
@@ -56,9 +60,11 @@
   (interceptor/interceptor
    {:name ::transact-interceptor
     :enter (fn [ctx]
+             (println "-----P1----------" ctx)
              (let [conn (get-in ctx [:request :system/database :conn])
-                   tx-data (get ctx :tx-data)]
-               (assoc ctx :tx-result (sql/insert! conn :account tx-data))))}))
+                   account (get ctx :tx-data)
+                   _ (println "------------P3-------------" account)]
+               (assoc ctx :tx-result (sql/insert! conn :account account))))}))
 
 (def confirm-account-interceptor
   {:name ::confirm-account-interceptor

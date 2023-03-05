@@ -99,7 +99,20 @@
   cr/system
   (-> cr/system :api-server :service ::http/service-fn)
 
-  (-> cr/system :database :database)
+  (-> cr/system :database)
+
+  (-> cr/system :auth)
+
+  (keys cr/system)
+
+
+  (-> (pt/response-for
+       (-> cr/system :api-server :service ::http/service-fn)
+       :post "/account/sign-up"
+       :headers {"Content-Type" "application/transit+json"}
+       :body (transit-write {:email "ab1c@com"
+                             :password "Pa$$w0rd"}))
+      (update :body transit-read))
 
   (pt/response-for
    (-> cr/system :api-server :service ::http/service-fn)
@@ -140,6 +153,8 @@
                          :public true
                          :prep-time 30
                          :img "https://github.com/clojure.png"}))
+
+
 
   (pt/response-for
    (-> cr/system :api-server :service ::http/service-fn)

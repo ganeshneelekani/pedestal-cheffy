@@ -87,16 +87,21 @@
 (defn create-cognito-account
   [{:keys [config cognito-idp]} {:keys [email password]}]
   (let [client-id (:client-id config)
+        _ (println "----------3.0------" config "  " client-id "   " cognito-idp)
+        _ (println "----------3.1------" email "  " password)
         client-secret (:client-secret config)
+        secret-hash (calculate-secret-hash
+                     {:client-id client-id
+                      :client-secret client-secret
+                      :username email})
+        _ (println "---T---" secret-hash)
         result (aws/invoke cognito-idp
                            {:op :SignUp
                             :request {:ClientId client-id
                                       :Username email
                                       :Password password
-                                      :SecretHash (calculate-secret-hash
-                                                   {:client-id client-id
-                                                    :client-secret client-secret
-                                                    :username email})}})]
+                                      :SecretHash secret-hash}})
+        _ (println "----------3.2-----" result)]
     (when-anomaly-throw result)
     [{:account/account-id (:UserSub result)
       :account/display-name email}]))
@@ -149,12 +154,12 @@
     (when-anomaly-throw result)))
 
 
-(defrecord Auth [config cognito-idp]
+(defrecord Auth [config cognito-idp key-provider]
 
   component/Lifecycle
 
   (start [component]
-    (println ";; Starting Auth")
+    (println ";; Starting Auth 1")
     (let [key-provider (-> (:jwks config)
                            (UrlJwkProvider.)
                            (GuavaCachedJwkProvider.))]
