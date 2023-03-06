@@ -8,7 +8,6 @@
 
 (defn list-recipes-response
   [request]
-  (println "---100---" (keys request))
   (let [db (get-in request [:system/database :database])
         account-id (get-in request [:headers "authorization"])
         recipes (db/list-all-recipes db account-id)]

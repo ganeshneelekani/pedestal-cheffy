@@ -46,7 +46,7 @@
   component/Lifecycle
 
   (start [component]
-    (println ";; Stating API Server 1 ")
+    (println ";; Stating API Server ")
     (let [service (-> service-map
                       (cheffy-routes)
                       (cheffy-interceptors [(inject-system {:system/database database :system/auth auth})])

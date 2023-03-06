@@ -8,9 +8,9 @@
                :dbtype   "postgresql"})
 
 (def auth-config {:client-id (or (System/getenv "AUTH_CLIENT_ID") "6b7o54l015fc7f2brn0uh6ibr")
-                  :client-secret (or (System/getenv "AUTH_CLIENT_SECREAT") "1s6cp8oiujjnfso0d1bllbdbe5tfnlage40ce3v2b29fhjs9is0k")
+                  :client-secret (or (System/getenv "AUTH_CLIENT_SECREAT") "Masked")
                   :user-pool-id (or (System/getenv "AUTH_POOL_ID") "us-east-1_vhfZ33jne")
-                  :jwks "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_vhfZ33jne"})
+                  :jwks "Masked"})
 
 (def service-map {:env :dev
                   :io.pedestal.http/type :jetty
@@ -24,7 +24,7 @@
 
 (def migratus-config
   {:store         :database
-   :migration-dir "migrations1"
+   :migration-dir "migrations"
    :db            database})
 
 ;; (def config

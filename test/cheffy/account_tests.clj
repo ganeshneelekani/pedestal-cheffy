@@ -18,7 +18,8 @@
                                      :post "/account/sign-up"
                                      :headers {"Content-Type" "application/transit+json"}
                                      :body (ts/transit-write {:email @random-email
-                                                              :password "Pa$$w0rd"}))
+                                                              :password "Pa$$w0rd"
+                                                              :picture (str "http://app.com/picture/" @random-email)}))
                                     (update :body ts/transit-read))]
       (is (= 200 status))
       (is (contains? body :account-id))))
@@ -30,7 +31,7 @@
                             :post "/account/confirm"
                             :headers {"Content-Type" "application/transit+json"}
                             :body (ts/transit-write {:email @random-email
-                                                     :confirmation-code "763118"}))]
+                                                     :confirmation-code "041700"}))]
       (is (= 204 status))))
 
   (testing "log-in"

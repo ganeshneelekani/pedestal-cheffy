@@ -43,15 +43,11 @@
 (def sign-up-interceptor
   {:name ::sign-up-interceptor
    :enter (fn [{:keys [request] :as ctx}]
-            (println "---------1111---------" (keys request))
-            (println "----1@---------" (:system/auth request))
             (let [create-cognito-account (auth/create-cognito-account
                                           (:system/auth request)
-                                          (:transit-params request))
-                  _ (println "---2.1-----" create-cognito-account)]
+                                          (:transit-params request))]
               (assoc ctx :tx-data create-cognito-account)))
    :leave (fn [ctx]
-            (println "---K----")
             (let [account-id (-> ctx :tx-data (first) :account/account-id)]
               (assoc ctx :response (rr/response {:account-id account-id}))))})
 
@@ -60,10 +56,8 @@
   (interceptor/interceptor
    {:name ::transact-interceptor
     :enter (fn [ctx]
-             (println "-----P1----------" ctx)
              (let [conn (get-in ctx [:request :system/database :conn])
-                   account (get ctx :tx-data)
-                   _ (println "------------P3-------------" account)]
+                   account (get ctx :tx-data)]
                (assoc ctx :tx-result (sql/insert! conn :account account))))}))
 
 (def confirm-account-interceptor
