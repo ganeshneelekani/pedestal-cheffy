@@ -8,11 +8,12 @@
                :dbtype   "postgresql"})
 
 (def auth-config {:client-id (or (System/getenv "AUTH_CLIENT_ID") "6b7o54l015fc7f2brn0uh6ibr")
-                  :client-secret (or (System/getenv "AUTH_CLIENT_SECREAT") "Masked")
-                  :user-pool-id (or (System/getenv "AUTH_POOL_ID") "us-east-1_vhfZ33jne")
-                  :jwks "Masked"})
+                  :client-secret (or (System/getenv "AUTH_CLIENT_SECREAT") "MASKED")
+                  :user-pool-id (or (System/getenv "AUTH_POOL_ID") "MASKED")
+                  :jwks (or (System/getenv "AUTH_JWKS") "MASKED")})
 
-(def service-map {:env :dev
+
+(def service-map {:env :prod
                   :io.pedestal.http/type :jetty
                   :io.pedestal.http/join? false
                   :io.pedestal.http/port (or (System/getenv "PORT") 3100)})

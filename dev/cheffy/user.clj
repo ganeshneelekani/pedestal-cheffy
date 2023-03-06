@@ -115,10 +115,10 @@
                              :password "Pa$$w0rd"}))
       (update :body transit-read))
 
-  (pt/response-for
-   (-> cr/system :api-server :service ::http/service-fn)
-   :get  "/recipes"
-   :headers {"Authorization" "auth0|63f3527a09b12c77b8d383b6"})
+  (transit-read (:body (-> (pt/response-for
+                            (-> cr/system :api-server :service ::http/service-fn)
+                            :get  "/recipes"
+                            :headers {"Authorization" "auth0|63f3527a09b12c77b8d383b6"}))))
 
   (defn cheffy-interceptors
     [service-map sys-interceptors]
